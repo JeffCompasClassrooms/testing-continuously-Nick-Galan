@@ -1,18 +1,62 @@
 name: Test Orchestrator
 
-# Allows a “Run workflow” button in the Actions tab
 on:
   workflow_dispatch: {}
 
 jobs:
   run-tests:
     runs-on: ubuntu-latest
+
     steps:
-      - name: Checkout repository
+      - name: Checkout orchestrator repo
         uses: actions/checkout@v4
 
-      # ---- your tests go here ----
-      - name: Run test for repo 
+      # ---------- UNIT TESTS ----------
+      - name: Checkout unit tests repo
+        uses: actions/checkout@v4
+        with:
+          repository: Nick-Galan/testing-units-f25-Nick-Galan
+          path: testing-units-f25
+
+      - name: Run unit tests
+        working-directory: testing-units-f25
         run: |
-          echo "Running tests..."
-          # replace this line with your actual test command(s)
+          python -m pip install --upgrade pip
+          if [ -f requirements.txt ]; then
+            pip install -r requirements.txt
+          fi
+          pytest
+
+      # ---------- SYSTEM TESTS ----------
+      - name: Checkout system tests repo
+        uses: actions/checkout@v4
+        with:
+          repository: Nick-Galan/testing-systems-Nick-Galan
+          path: testing-systems
+
+      - name: Run system tests
+        working-directory: testing-systems
+        run: |
+          python -m pip install --upgrade pip
+          if [ -f requirements.txt ]; then
+            pip install -r requirements.txt
+          fi
+          pytest
+
+      # ---------- BEHAVE TESTS ----------
+      - name: Checkout behave tests repo
+        uses: actions/checkout@v4
+        with:
+          repository: Nick-Galan/testing-with-behave-Nick-Galan
+          path: testing-with-behave
+
+      - name: Run behave tests
+        working-directory: testing-with-behave
+        run: |
+          python -m pip install --upgrade pip
+          if [ -f requirements.txt ]; then
+            pip install -r requirements.txt
+          fi
+          pip install behave behave-webdriver
+          behave
+
